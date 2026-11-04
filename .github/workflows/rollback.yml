@@ -11,7 +11,7 @@ on:
       environment:
         description: Environment to roll back
         type: choice
-        options: [stg, prd]
+        options: [prd]
         default: prd
       lambda_version:
         description: Lambda version to restore (empty = the one before the current)

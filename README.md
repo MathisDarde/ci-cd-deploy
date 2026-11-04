@@ -76,7 +76,6 @@ Node, pnpm, Terraform, AWS CLI, PostgreSQL, navigateurs Playwright.
 
 ```
 push ──► CI (ci.yml) ──vert sur main──► CD (cd.yml)
-                                         ├─ stg : automatique
                                          └─ prd : après approbation (environment "prd")
 deploy.yml, toujours dans cet ordre :
   1. INFRA       terraform plan/apply (environments/<env>.tfvars)
@@ -95,11 +94,13 @@ précédente, `vercel rollback`, SSG régénéré depuis le tag stable précéde
 
 ### 1. Supabase
 
-1. Créer un projet ; dans **SQL Editor**, exécuter [`db/init.sql`](db/init.sql).
-2. Récupérer deux chaînes de connexion (_Project Settings → Database_) :
+1. Créer un projet (région Paris), le plan gratuit suffit : pas de branching Supabase.
+2. Bouton **Connect** → _Connection String_, deux chaînes :
    - **Transaction pooler** (port 6543) → `DATABASE_URL` (utilisée par Lambda) ;
-   - **Session / direct** (port 5432) → `MIGRATION_DATABASE_URL` (utilisée par les migrations).
-3. En local : `MIGRATION_DATABASE_URL=… pnpm db:migrate` applique `001_likes.sql`.
+   - **Session pooler** (port 5432) → `MIGRATION_DATABASE_URL` (utilisée par les migrations ;
+     la _Direct connection_ est IPv6 seulement, injoignable depuis GitHub Actions).
+3. `MIGRATION_DATABASE_URL=… pnpm db:migrate` exécute `db/init.sql` puis les migrations
+   (la CD le fait aussi avant chaque déploiement).
 
 ### 2. AWS
 
@@ -121,19 +122,19 @@ précédente, `vercel rollback`, SSG régénéré depuis le tag stable précéde
 
 ### 4. GitHub
 
-_Settings → Environments_ : créer `stg` et `prd` (sur `prd` : **Required reviewers**, le clic humain).
+_Settings → Environments_ : créer `prd` avec **Required reviewers** (le clic humain) et la branche `main` seule autorisée.
 
-| Type     | Nom                                  | Valeur                                             |
-| -------- | ------------------------------------ | -------------------------------------------------- |
-| variable | `AWS_DEPLOY_ROLE_ARN`                | sortie `deploy_role_arn` du bootstrap              |
-| variable | `AWS_REGION`                         | `eu-west-3`                                        |
-| variable | `TF_STATE_BUCKET`                    | sortie `tfstate_bucket` du bootstrap               |
-| variable | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | `.vercel/project.json` après `vercel link`         |
-| secret   | `DATABASE_URL`                       | Supabase, pooler 6543 (une base par environnement) |
-| secret   | `MIGRATION_DATABASE_URL`             | Supabase, connexion directe 5432                   |
-| secret   | `VERCEL_TOKEN`                       | token Vercel                                       |
+| Type     | Nom                                  | Valeur                                     |
+| -------- | ------------------------------------ | ------------------------------------------ |
+| variable | `AWS_DEPLOY_ROLE_ARN`                | sortie `deploy_role_arn` du bootstrap      |
+| variable | `AWS_REGION`                         | `eu-west-3`                                |
+| variable | `TF_STATE_BUCKET`                    | sortie `tfstate_bucket` du bootstrap       |
+| variable | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | `.vercel/project.json` après `vercel link` |
+| secret   | `DATABASE_URL`                       | Supabase, transaction pooler 6543          |
+| secret   | `MIGRATION_DATABASE_URL`             | Supabase, session pooler 5432              |
+| secret   | `VERCEL_TOKEN`                       | token Vercel                               |
 
-Variables de dépôt optionnelles pour la nuit : `STG_API_URL`, `STG_SSR_URL` (k6 et ZAP).
+Variables de dépôt optionnelles pour la nuit : `LOAD_TEST_API_URL`, `LOAD_TEST_SSR_URL` (k6), `DAST_TARGET_URL` (ZAP).
 _Settings → Pages → Source : GitHub Actions_ pour le rapport de couverture et le badge.
 _Settings → Branches_ : protéger `main` avec le check requis **CI passed**.
 
