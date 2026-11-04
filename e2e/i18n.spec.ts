@@ -34,7 +34,8 @@ test.describe('languages', () => {
     )
 
     await page.getByTestId('language-select').selectOption('de')
-    await expect(page).toHaveURL(/\/de$/)
+    // The search query is kept when switching language.
+    await expect(page).toHaveURL(/\/de(\?q=pikachu)?$/)
     await search(page, 'pikachu', 'Suche')
     await page.getByRole('button', { name: 'Pikachu zur Wunschliste hinzufügen' }).click()
     await expect(page.getByRole('alert').last()).toContainText(

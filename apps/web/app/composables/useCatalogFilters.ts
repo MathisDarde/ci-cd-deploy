@@ -57,9 +57,21 @@ export function useCatalogFilters() {
     clearTimeout(timer)
     writePending = true
     timer = setTimeout(async () => {
-      await router.replace({ path, query: toQuery(filters) })
+      // The user left this page meanwhile (e.g. switched language: /fr → /de):
+      // writing now would navigate back to the old path.
+      if (router.currentRoute.value.path === path) {
+        await router.replace({ path, query: toQuery(filters) })
+      }
       writePending = false
     }, URL_WRITE_DELAY_MS)
+  })
+
+  // A navigation to another path cancels the pending URL write.
+  const removeGuard = router.beforeEach(to => {
+    if (to.path !== path) {
+      clearTimeout(timer)
+      writePending = false
+    }
   })
 
   // External changes only (nav link, back button): our own writes would otherwise
@@ -71,7 +83,10 @@ export function useCatalogFilters() {
     },
   )
 
-  onBeforeUnmount(() => clearTimeout(timer))
+  onBeforeUnmount(() => {
+    clearTimeout(timer)
+    removeGuard()
+  })
 
   const hasActiveFilters = computed(() =>
     Boolean(filters.q || filters.types.length || filters.generation || filters.rarity),
