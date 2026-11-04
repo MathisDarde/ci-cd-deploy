@@ -8,6 +8,8 @@
 //
 // Each URL is optional: only the configured targets are checked.
 
+import { vercelBypassHeaders } from './vercel-bypass.mjs'
+
 const TIMEOUT_MS = 10_000
 const ATTEMPTS = Number(process.env.SMOKE_ATTEMPTS ?? 5)
 const RETRY_DELAY_MS = Number(process.env.SMOKE_RETRY_DELAY_MS ?? 5_000)
@@ -82,7 +84,7 @@ async function run(check) {
       const response = await fetch(check.url, {
         redirect: 'follow',
         signal: AbortSignal.timeout(TIMEOUT_MS),
-        headers: { 'User-Agent': 'pokewishlist-smoke-test' },
+        headers: { 'User-Agent': 'pokewishlist-smoke-test', ...vercelBypassHeaders(check.url) },
       })
       const body = await response.text()
       const duration = Date.now() - started

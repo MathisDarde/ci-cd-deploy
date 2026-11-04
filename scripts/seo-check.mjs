@@ -5,6 +5,8 @@
 //
 // Compares every base URL (SSR, SSG, …) on the same pages.
 
+import { vercelBypassHeaders } from './vercel-bypass.mjs'
+
 const bases = process.argv.slice(2).map(url => url.replace(/\/$/, ''))
 if (!bases.length) {
   console.error('Usage: node scripts/seo-check.mjs <base-url> [<base-url>…]')
@@ -59,7 +61,9 @@ for (const page of PAGES) {
   for (const base of bases) {
     const url = `${base}${page.path}`
     try {
-      const response = await fetch(url, { headers: { 'User-Agent': 'pokewishlist-seo-check' } })
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'pokewishlist-seo-check', ...vercelBypassHeaders(url) },
+      })
       const html = await response.text()
       const { problems, summary } = audit(html, page.name)
       if (response.status !== 200) problems.unshift(`HTTP ${response.status}`)

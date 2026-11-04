@@ -7,6 +7,7 @@ name: Deploy (reusable)
 # GitHub environment settings (Settings → Environments → prd):
 #   variables: AWS_DEPLOY_ROLE_ARN, AWS_REGION, TF_STATE_BUCKET, VERCEL_ORG_ID, VERCEL_PROJECT_ID
 #   secrets:   DATABASE_URL (Supabase pooler, 6543), MIGRATION_DATABASE_URL (direct, 5432), VERCEL_TOKEN
+#              VERCEL_AUTOMATION_BYPASS_SECRET (smoke tests through Vercel Deployment Protection)
 #   prd only:  "Required reviewers" = the human click before production.
 
 on:
@@ -190,9 +191,12 @@ jobs:
           SSR_URL: ${{ steps.ssr.outputs.url }}
           SSG_URL: ${{ steps.tf.outputs.front_url }}
           SMOKE_ATTEMPTS: '10'
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: SEO check (HTML without JavaScript)
         run: node scripts/seo-check.mjs "${{ steps.ssr.outputs.url }}" "${{ steps.tf.outputs.front_url }}"
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       # ---------- Bookkeeping / automatic rollback ----------
       - name: Tag the stable deployment

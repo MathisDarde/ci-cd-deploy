@@ -125,15 +125,16 @@ précédente, `vercel rollback`, SSG régénéré depuis le tag stable précéde
 
 _Settings → Environments_ : créer `prd` avec **Required reviewers** (le clic humain) et la branche `main` seule autorisée.
 
-| Type     | Nom                                  | Valeur                                     |
-| -------- | ------------------------------------ | ------------------------------------------ |
-| variable | `AWS_DEPLOY_ROLE_ARN`                | sortie `deploy_role_arn` du bootstrap      |
-| variable | `AWS_REGION`                         | `eu-west-3`                                |
-| variable | `TF_STATE_BUCKET`                    | sortie `tfstate_bucket` du bootstrap       |
-| variable | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | `.vercel/project.json` après `vercel link` |
-| secret   | `DATABASE_URL`                       | Supabase, transaction pooler 6543          |
-| secret   | `MIGRATION_DATABASE_URL`             | Supabase, session pooler 5432              |
-| secret   | `VERCEL_TOKEN`                       | token Vercel                               |
+| Type     | Nom                                  | Valeur                                                                       |
+| -------- | ------------------------------------ | ---------------------------------------------------------------------------- |
+| variable | `AWS_DEPLOY_ROLE_ARN`                | sortie `deploy_role_arn` du bootstrap                                        |
+| variable | `AWS_REGION`                         | `eu-west-3`                                                                  |
+| variable | `TF_STATE_BUCKET`                    | sortie `tfstate_bucket` du bootstrap                                         |
+| variable | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | `.vercel/project.json` après `vercel link`                                   |
+| secret   | `DATABASE_URL`                       | Supabase, transaction pooler 6543                                            |
+| secret   | `MIGRATION_DATABASE_URL`             | Supabase, session pooler 5432                                                |
+| secret   | `VERCEL_TOKEN`                       | token Vercel                                                                 |
+| secret   | `VERCEL_AUTOMATION_BYPASS_SECRET`    | Vercel → Settings → Deployment Protection → Protection Bypass for Automation |
 
 Variables de dépôt optionnelles pour la nuit : `LOAD_TEST_API_URL`, `LOAD_TEST_SSR_URL` (k6), `DAST_TARGET_URL` (ZAP).
 _Settings → Pages → Source : GitHub Actions_ pour le rapport de couverture et le badge.
