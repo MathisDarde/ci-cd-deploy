@@ -199,12 +199,6 @@ jobs:
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       # ---------- Bookkeeping / automatic rollback ----------
-      - name: Tag the stable deployment
-        run: |
-          tag="deploy-${ENV_NAME}-$(date -u +%Y%m%d-%H%M%S)"
-          git tag -a "$tag" -m "Deployed to ${ENV_NAME} (Lambda version ${{ steps.api.outputs.version }}, ${{ steps.ssr.outputs.url }})"
-          git push origin "$tag"
-
       - name: Roll back the API on failure
         if: failure() && steps.api.outputs.previous != ''
         run: |
@@ -214,4 +208,13 @@ jobs:
 
       - name: Roll back the SSR front on failure
         if: failure() && steps.ssr.outputs.url != '' && inputs.environment == 'prd'
-        run: npx --yes vercel@latest rollback --yes --token="${{ secrets.VERCEL_TOKEN }}"
+        run: npx --yes vercel@latest rollback --yes --scope="$VERCEL_ORG_ID" --token="${{ secrets.VERCEL_TOKEN }}"
+
+      # After the rollback steps: a bookkeeping failure must not undo a healthy deployment.
+      - name: Tag the stable deployment
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          tag="deploy-${ENV_NAME}-$(date -u +%Y%m%d-%H%M%S)"
+          git tag -a "$tag" -m "Deployed to ${ENV_NAME} (Lambda version ${{ steps.api.outputs.version }}, ${{ steps.ssr.outputs.url }})"
+          git push origin "$tag"
