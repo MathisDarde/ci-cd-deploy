@@ -1,0 +1,67 @@
+# Dockerized app: API + local PostgreSQL (+ the SSR front).
+#   docker compose up --build        → http://localhost:3000 (front), :3001 (API)
+#   docker compose up db             → only the database, for `pnpm dev`
+name: pokewishlist
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: pokewishlist
+      POSTGRES_PASSWORD: pokewishlist
+      POSTGRES_DB: pokewishlist
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      # Runs once, on an empty volume: same init.sql as on Supabase.
+      - ./db/init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      - ./db/create-test-db.sql:/docker-entrypoint-initdb.d/002_test_db.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U pokewishlist']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: build
+    command: pnpm --filter @pokewishlist/api db:migrate
+    environment:
+      DATABASE_URL: postgres://pokewishlist:pokewishlist@db:5432/pokewishlist
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      APP_ENV: loc
+      DATABASE_URL: postgres://pokewishlist:pokewishlist@db:5432/pokewishlist
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - '3001:3001'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      # Called by the browser: the API as seen from the host.
+      NUXT_PUBLIC_API_BASE: http://localhost:3001
+      NUXT_PUBLIC_SITE_URL: http://localhost:3000
+      NUXT_PUBLIC_I18N_BASE_URL: http://localhost:3000
+    ports:
+      - '3000:3000'
+    depends_on:
+      - api
+
+volumes:
+  db-data:
