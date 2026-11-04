@@ -1,0 +1,44 @@
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
+
+# Tests
+coverage
+playwright-report
+test-results
+reports
+.stryker-tmp
+blob-report
+
+# Terraform
+.terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+*.auto.tfvars
+!*.example.tfvars
+
+# Vercel
+.vercel
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files: never commit secrets, only the examples
+.env
+.env.*
+!.env.example
