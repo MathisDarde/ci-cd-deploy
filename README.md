@@ -1,10 +1,8 @@
 # PokéWishlist
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
-[![CD](https://github.com/OWNER/REPO/actions/workflows/cd.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/cd.yml)
-[![Coverage](https://img.shields.io/endpoint?url=https://OWNER.github.io/REPO/badges/coverage.json)](https://OWNER.github.io/REPO/)
-
-> Remplacer `OWNER/REPO` par le dépôt GitHub une fois créé.
+[![CI](https://github.com/MathisDarde/ci-cd-deploy/actions/workflows/ci.yml/badge.svg)](https://github.com/MathisDarde/ci-cd-deploy/actions/workflows/ci.yml)
+[![CD](https://github.com/MathisDarde/ci-cd-deploy/actions/workflows/cd.yml/badge.svg)](https://github.com/MathisDarde/ci-cd-deploy/actions/workflows/cd.yml)
+[![Coverage](https://img.shields.io/endpoint?url=https://mathisdarde.github.io/ci-cd-deploy/badges/coverage.json)](https://mathisdarde.github.io/ci-cd-deploy/)
 
 TP fil rouge du module **IIM M1 — Intégration & Déploiement continu** : une liste de 6 Pokémon à
 capturer, avec un front **Nuxt** (SSR sur Vercel + SSG sur S3/CloudFront), une API **Hono**
@@ -110,7 +108,7 @@ précédente, `vercel rollback`, SSG régénéré depuis le tag stable précéde
    ```bash
    cd infra/bootstrap
    terraform init
-   terraform apply -var github_repository=OWNER/REPO -var budget_email=vous@example.com
+   terraform apply -var github_repository=MathisDarde/ci-cd-deploy -var budget_email=vous@example.com
    ```
    Il crée le bucket de state Terraform, la confiance **OIDC GitHub** (aucune clé AWS stockée
    dans GitHub) et le rôle de déploiement.
