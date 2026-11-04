@@ -18,7 +18,7 @@ jobs:
     name: Lint (ESLint)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm lint
 
@@ -26,7 +26,7 @@ jobs:
     name: Format (Prettier --check)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm format:check
 
@@ -34,7 +34,7 @@ jobs:
     name: Types (tsc, vue-tsc)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm typecheck
 
@@ -42,7 +42,7 @@ jobs:
     name: Translations (locale keys)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Home-made check: plain Node, no dependency needed.
       - uses: actions/setup-node@v4
         with:
@@ -56,7 +56,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm test:coverage
       - name: Coverage summary
@@ -106,7 +106,7 @@ jobs:
     env:
       TEST_DATABASE_URL: postgres://test:test@localhost:5432/pokewishlist_test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm --filter @pokewishlist/api test:integration
 
@@ -114,7 +114,7 @@ jobs:
     name: Build (API bundle, nuxt build)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: pnpm build
         env:
@@ -133,7 +133,7 @@ jobs:
     name: Audit (known vulnerabilities)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       # Production dependencies only; high and critical advisories block the PR.
       - run: pnpm audit --prod --audit-level=high
@@ -142,7 +142,7 @@ jobs:
     name: Secrets (gitleaks)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       # The official image scans the whole history (gitleaks-action breaks on a repo's
@@ -170,7 +170,7 @@ jobs:
     env:
       DATABASE_URL: postgres://test:test@localhost:5432/pokewishlist_e2e
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - uses: actions/download-artifact@v4
         with:
