@@ -32,6 +32,16 @@ variable "github_repository" {
   type        = string
 }
 
+variable "github_subject_prefix" {
+  description = <<-EOT
+    OIDC "sub" prefix when the repository uses immutable subject claims (the default for
+    new repositories): repo:<owner>@<owner-id>/<repo>@<repo-id>. Read it with
+    `gh api repos/<owner>/<repo>/actions/oidc/customization/sub` (sub_claim_prefix).
+  EOT
+  type        = string
+  default     = ""
+}
+
 variable "budget_email" {
   description = "Receives the budget alerts."
   type        = string
@@ -101,11 +111,15 @@ data "aws_iam_policy_document" "github_assume" {
       variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
     }
-    # Only workflows of this repository, running for a GitHub environment (stg, prd…).
+    # Only workflows of this repository, running for a GitHub environment (prd…).
+    # Both subject formats: repo:owner/repo:… and the immutable repo:owner@id/repo@id:…
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repository}:environment:*"]
+      values = compact([
+        "repo:${var.github_repository}:environment:*",
+        var.github_subject_prefix == "" ? "" : "${var.github_subject_prefix}:environment:*",
+      ])
     }
   }
 }

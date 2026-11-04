@@ -109,7 +109,7 @@ précédente, `vercel rollback`, SSG régénéré depuis le tag stable précéde
    ```bash
    cd infra/bootstrap
    terraform init
-   terraform apply -var github_repository=MathisDarde/ci-cd-deploy -var budget_email=vous@example.com
+   terraform apply -var github_repository=MathisDarde/ci-cd-deploy -var budget_email=vous@example.com \n     -var github_subject_prefix="$(gh api repos/MathisDarde/ci-cd-deploy/actions/oidc/customization/sub --jq .sub_claim_prefix)"
    ```
    Il crée le bucket de state Terraform, la confiance **OIDC GitHub** (aucune clé AWS stockée
    dans GitHub) et le rôle de déploiement.
