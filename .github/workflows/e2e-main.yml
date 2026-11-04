@@ -1,0 +1,34 @@
+name: After merge
+
+# After a merge on main (< 30 min): the heavier checks — E2E on every project and
+# visual regression.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    name: Visual regression (Playwright screenshots)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      # Baselines are Linux screenshots: commit e2e/*-snapshots/ once generated
+      # (download the artifact of the first run). Missing baselines are written, not failed.
+      - run: pnpm test:e2e --project=visual --update-snapshots=missing
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-snapshots
+          path: |
+            e2e/**/*-snapshots
+            playwright-report
+            test-results
+          retention-days: 14
