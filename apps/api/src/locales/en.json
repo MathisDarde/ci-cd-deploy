@@ -1,0 +1,10 @@
+{
+  "errors": {
+    "INVALID_POKEMON": "Invalid Pokémon: expected a positive integer id and a lowercase name.",
+    "DUPLICATE_POKEMON": "This Pokémon is already in your wishlist.",
+    "WISHLIST_FULL": "Your wishlist is full: 6 Pokémon maximum.",
+    "POKEMON_NOT_FOUND": "This Pokémon is not in your wishlist.",
+    "ROUTE_NOT_FOUND": "This route does not exist.",
+    "INTERNAL_ERROR": "Something went wrong on our side. Please try again."
+  }
+}
