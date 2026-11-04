@@ -145,9 +145,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # The official image scans the whole history (gitleaks-action breaks on a repo's
+      # first push: it scans `first-commit^..HEAD`, a parent that does not exist).
+      - name: Scan the Git history for secrets
+        run: >-
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.24.3
+          git /repo --redact --verbose --exit-code 1
 
   e2e:
     name: E2E (Playwright, Nuxt + Hono + PostgreSQL)
