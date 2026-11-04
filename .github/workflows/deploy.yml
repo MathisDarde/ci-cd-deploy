@@ -148,7 +148,8 @@ jobs:
             flags+=(--prod)
           fi
           npx --yes vercel@latest pull --yes --environment="$target" --token="$VERCEL_TOKEN"
-          NUXT_PUBLIC_APP_VERSION="$APP_VERSION" \
+          # Nitro must emit the Vercel Build Output (.vercel/output), not a Node server.
+          NITRO_PRESET=vercel NUXT_PUBLIC_APP_VERSION="$APP_VERSION" \
             npx --yes vercel@latest build "${flags[@]}" --token="$VERCEL_TOKEN"
           url=$(npx --yes vercel@latest deploy --prebuilt "${flags[@]}" --token="$VERCEL_TOKEN" \
             --env NUXT_PUBLIC_API_BASE="$API_URL" \
