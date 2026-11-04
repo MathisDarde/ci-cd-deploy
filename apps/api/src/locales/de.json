@@ -1,0 +1,10 @@
+{
+  "errors": {
+    "INVALID_POKEMON": "Ungültiges Pokémon: erwartet werden eine positive ganze Zahl als ID und ein kleingeschriebener Name.",
+    "DUPLICATE_POKEMON": "Dieses Pokémon ist bereits auf deiner Wunschliste.",
+    "WISHLIST_FULL": "Deine Wunschliste ist voll: maximal 6 Pokémon.",
+    "POKEMON_NOT_FOUND": "Dieses Pokémon ist nicht auf deiner Wunschliste.",
+    "ROUTE_NOT_FOUND": "Diese Route existiert nicht.",
+    "INTERNAL_ERROR": "Bei uns ist etwas schiefgelaufen. Bitte versuche es erneut."
+  }
+}

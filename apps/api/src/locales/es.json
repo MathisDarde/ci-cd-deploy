@@ -1,0 +1,10 @@
+{
+  "errors": {
+    "INVALID_POKEMON": "Pokémon no válido: se esperan un id entero positivo y un nombre en minúsculas.",
+    "DUPLICATE_POKEMON": "Este Pokémon ya está en tu lista.",
+    "WISHLIST_FULL": "Tu lista está llena: 6 Pokémon como máximo.",
+    "POKEMON_NOT_FOUND": "Este Pokémon no está en tu lista.",
+    "ROUTE_NOT_FOUND": "Esta ruta no existe.",
+    "INTERNAL_ERROR": "Algo ha fallado por nuestra parte. Inténtalo de nuevo."
+  }
+}
