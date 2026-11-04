@@ -23,7 +23,7 @@ jobs:
       # Baselines are Linux screenshots: commit e2e/*-snapshots/ once generated
       # (download the artifact of the first run). Missing baselines are written, not failed.
       - run: pnpm test:e2e --project=visual --update-snapshots=missing
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: visual-snapshots
