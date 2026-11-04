@@ -1,0 +1,12 @@
+node_modules
+pnpm-lock.yaml
+**/.nuxt
+**/.output
+**/dist
+**/coverage
+playwright-report
+test-results
+reports
+infra/**/.terraform
+*.tfstate*
+apps/web/public

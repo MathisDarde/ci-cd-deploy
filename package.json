@@ -1,0 +1,42 @@
+{
+  "name": "pokewishlist",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.12.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @pokewishlist/api --filter @pokewishlist/web dev",
+    "build": "pnpm -r build",
+    "lint": "eslint . && pnpm --filter @pokewishlist/web lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:coverage": "pnpm -r test:coverage",
+    "test:integration": "pnpm --filter @pokewishlist/api test:integration",
+    "test:e2e": "playwright test",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "seo:check": "node scripts/seo-check.mjs",
+    "db:migrate": "pnpm --filter @pokewishlist/api db:migrate",
+    "prepare": "simple-git-hooks"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "simple-git-hooks": "^2.14.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.1"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged"
+  }
+}
