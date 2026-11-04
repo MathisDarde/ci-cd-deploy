@@ -1,0 +1,127 @@
+{
+  "app": {
+    "name": "PokéWishlist",
+    "description": "Browse every Pokémon and build the team of six you want to catch.",
+    "nav": {
+      "label": "Main navigation",
+      "catalog": "Catalog",
+      "wishlist": "My wishlist"
+    },
+    "language": "Language",
+    "dataSource": "Data and artwork from",
+    "trademark": "Pokémon is a trademark of Nintendo / Game Freak / The Pokémon Company.",
+    "dismiss": "Dismiss"
+  },
+  "home": {
+    "title": "Every Pokémon",
+    "intro": "Search the Pokédex and add up to {limit} Pokémon to your wishlist.",
+    "seoTitle": "PokéWishlist — build your dream team"
+  },
+  "catalog": {
+    "count": "no Pokémon | {count} Pokémon | {count} Pokémon",
+    "outOf": "out of {total}",
+    "loading": "Loading the Pokédex…",
+    "errorTitle": "The Pokédex could not be loaded",
+    "errorText": "PokéAPI is not responding right now. Check your connection and try again.",
+    "retry": "Try again",
+    "emptyTitle": "No Pokémon match these filters",
+    "emptyText": "Try another name or remove a filter.",
+    "reset": "Clear filters",
+    "more": "Show more"
+  },
+  "toolbar": {
+    "label": "Search, filters and sort",
+    "search": "Search",
+    "searchPlaceholder": "Name or number",
+    "generation": "Generation",
+    "generationOption": "Generation {gen}",
+    "all": "All",
+    "rarity": "Rarity",
+    "sortBy": "Sort by",
+    "ascending": "↑ Ascending",
+    "descending": "↓ Descending",
+    "types": "Types (2 max)",
+    "clearAll": "Clear all"
+  },
+  "sort": {
+    "id": "Number",
+    "name": "Name",
+    "totalStats": "Stat total",
+    "hp": "HP",
+    "attack": "Attack",
+    "defense": "Defense",
+    "speed": "Speed",
+    "height": "Height",
+    "weight": "Weight"
+  },
+  "rarity": {
+    "legendary": "Legendary",
+    "mythical": "Mythical"
+  },
+  "stats": {
+    "hp": "HP",
+    "attack": "Attack",
+    "defense": "Defense",
+    "specialAttack": "Sp. Atk",
+    "specialDefense": "Sp. Def",
+    "speed": "Speed",
+    "attackShort": "ATK",
+    "defenseShort": "DEF",
+    "speedShort": "SPD"
+  },
+  "types": {
+    "normal": "Normal",
+    "fire": "Fire",
+    "water": "Water",
+    "electric": "Electric",
+    "grass": "Grass",
+    "ice": "Ice",
+    "fighting": "Fighting",
+    "poison": "Poison",
+    "ground": "Ground",
+    "flying": "Flying",
+    "psychic": "Psychic",
+    "bug": "Bug",
+    "rock": "Rock",
+    "ghost": "Ghost",
+    "dragon": "Dragon",
+    "dark": "Dark",
+    "steel": "Steel",
+    "fairy": "Fairy"
+  },
+  "wishlist": {
+    "title": "My wishlist",
+    "intro": "The Pokémon you want to catch, {limit} at most.",
+    "count": "{count} / {limit}",
+    "empty": "Your wishlist is empty.",
+    "emptyCta": "Browse the catalog",
+    "emptySlot": "Free slot",
+    "add": "Add {name} to my wishlist",
+    "remove": "Remove {name} from my wishlist",
+    "like": "Like {name}",
+    "likes": "no likes | 1 like | {count} likes",
+    "added": "{name} added to your wishlist.",
+    "removed": "{name} removed from your wishlist.",
+    "loading": "Loading your wishlist…",
+    "loadError": "The wishlist could not be loaded. Is the API running?",
+    "networkError": "The API cannot be reached. Try again in a moment.",
+    "full": "Team full"
+  },
+  "pokemon": {
+    "number": "No. {number}",
+    "height": "Height",
+    "weight": "Weight",
+    "abilities": "Abilities",
+    "baseStats": "Base stats",
+    "back": "Back to the catalog",
+    "seoDescription": "{name}: types, base stats, height and weight. Add it to your PokéWishlist.",
+    "loadError": "This Pokémon could not be loaded from PokéAPI."
+  },
+  "error": {
+    "notFoundTitle": "Page not found",
+    "notFoundText": "This Pokémon or this page does not exist.",
+    "genericTitle": "Something went wrong",
+    "genericText": "Please try again in a moment.",
+    "home": "Back to the catalog"
+  }
+}

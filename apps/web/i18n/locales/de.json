@@ -1,0 +1,127 @@
+{
+  "app": {
+    "name": "PokéWishlist",
+    "description": "Entdecke alle Pokémon und stelle das Sechser-Team zusammen, das du fangen willst.",
+    "nav": {
+      "label": "Hauptnavigation",
+      "catalog": "Katalog",
+      "wishlist": "Meine Wunschliste"
+    },
+    "language": "Sprache",
+    "dataSource": "Daten und Bilder von",
+    "trademark": "Pokémon ist eine Marke von Nintendo / Game Freak / The Pokémon Company.",
+    "dismiss": "Schließen"
+  },
+  "home": {
+    "title": "Alle Pokémon",
+    "intro": "Durchsuche den Pokédex und füge bis zu {limit} Pokémon zu deiner Wunschliste hinzu.",
+    "seoTitle": "PokéWishlist — stelle dein Traumteam zusammen"
+  },
+  "catalog": {
+    "count": "keine Pokémon | {count} Pokémon | {count} Pokémon",
+    "outOf": "von {total}",
+    "loading": "Pokédex wird geladen…",
+    "errorTitle": "Der Pokédex konnte nicht geladen werden",
+    "errorText": "PokéAPI antwortet gerade nicht. Prüfe deine Verbindung und versuche es erneut.",
+    "retry": "Erneut versuchen",
+    "emptyTitle": "Kein Pokémon passt zu diesen Filtern",
+    "emptyText": "Versuche einen anderen Namen oder entferne einen Filter.",
+    "reset": "Filter löschen",
+    "more": "Mehr anzeigen"
+  },
+  "toolbar": {
+    "label": "Suche, Filter und Sortierung",
+    "search": "Suche",
+    "searchPlaceholder": "Name oder Nummer",
+    "generation": "Generation",
+    "generationOption": "Generation {gen}",
+    "all": "Alle",
+    "rarity": "Seltenheit",
+    "sortBy": "Sortieren nach",
+    "ascending": "↑ Aufsteigend",
+    "descending": "↓ Absteigend",
+    "types": "Typen (max. 2)",
+    "clearAll": "Alles löschen"
+  },
+  "sort": {
+    "id": "Nummer",
+    "name": "Name",
+    "totalStats": "Statuswert-Summe",
+    "hp": "KP",
+    "attack": "Angriff",
+    "defense": "Verteidigung",
+    "speed": "Initiative",
+    "height": "Größe",
+    "weight": "Gewicht"
+  },
+  "rarity": {
+    "legendary": "Legendär",
+    "mythical": "Mysteriös"
+  },
+  "stats": {
+    "hp": "KP",
+    "attack": "Angriff",
+    "defense": "Verteidigung",
+    "specialAttack": "Sp.-Angr.",
+    "specialDefense": "Sp.-Vert.",
+    "speed": "Initiative",
+    "attackShort": "ANG",
+    "defenseShort": "VER",
+    "speedShort": "INI"
+  },
+  "types": {
+    "normal": "Normal",
+    "fire": "Feuer",
+    "water": "Wasser",
+    "electric": "Elektro",
+    "grass": "Pflanze",
+    "ice": "Eis",
+    "fighting": "Kampf",
+    "poison": "Gift",
+    "ground": "Boden",
+    "flying": "Flug",
+    "psychic": "Psycho",
+    "bug": "Käfer",
+    "rock": "Gestein",
+    "ghost": "Geist",
+    "dragon": "Drache",
+    "dark": "Unlicht",
+    "steel": "Stahl",
+    "fairy": "Fee"
+  },
+  "wishlist": {
+    "title": "Meine Wunschliste",
+    "intro": "Die Pokémon, die du fangen willst, höchstens {limit}.",
+    "count": "{count} / {limit}",
+    "empty": "Deine Wunschliste ist leer.",
+    "emptyCta": "Katalog ansehen",
+    "emptySlot": "Freier Platz",
+    "add": "{name} zur Wunschliste hinzufügen",
+    "remove": "{name} von der Wunschliste entfernen",
+    "like": "{name} gefällt mir",
+    "likes": "keine Likes | 1 Like | {count} Likes",
+    "added": "{name} wurde zur Wunschliste hinzugefügt.",
+    "removed": "{name} wurde von der Wunschliste entfernt.",
+    "loading": "Wunschliste wird geladen…",
+    "loadError": "Die Wunschliste konnte nicht geladen werden. Läuft die API?",
+    "networkError": "Die API ist nicht erreichbar. Versuche es gleich noch einmal.",
+    "full": "Team voll"
+  },
+  "pokemon": {
+    "number": "Nr. {number}",
+    "height": "Größe",
+    "weight": "Gewicht",
+    "abilities": "Fähigkeiten",
+    "baseStats": "Basiswerte",
+    "back": "Zurück zum Katalog",
+    "seoDescription": "{name}: Typen, Basiswerte, Größe und Gewicht. Füge es deiner PokéWishlist hinzu.",
+    "loadError": "Dieses Pokémon konnte nicht von PokéAPI geladen werden."
+  },
+  "error": {
+    "notFoundTitle": "Seite nicht gefunden",
+    "notFoundText": "Dieses Pokémon oder diese Seite existiert nicht.",
+    "genericTitle": "Etwas ist schiefgelaufen",
+    "genericText": "Bitte versuche es gleich noch einmal.",
+    "home": "Zurück zum Katalog"
+  }
+}
