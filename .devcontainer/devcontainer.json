@@ -1,0 +1,36 @@
+// Dev container: the same toolchain for every developer and for the CI.
+// VS Code → "Dev Containers: Reopen in Container". It is for coding, not for hosting the app.
+{
+  "name": "PokéWishlist",
+  "dockerComposeFile": ["docker-compose.yml"],
+  "service": "workspace",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/devcontainers/features/terraform:1": { "version": "1.9" },
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "forwardPorts": [3000, 3001, 5432],
+  "postCreateCommand": "corepack enable && pnpm install && pnpm exec playwright install --with-deps chromium && pnpm db:migrate",
+  "remoteEnv": {
+    "DATABASE_URL": "postgres://pokewishlist:pokewishlist@db:5432/pokewishlist",
+    "TEST_DATABASE_URL": "postgres://pokewishlist:pokewishlist@db:5432/pokewishlist_test",
+    "NUXT_PUBLIC_API_BASE": "http://localhost:3001"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Vue.volar",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-playwright.playwright",
+        "vitest.explorer",
+        "hashicorp.terraform"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  }
+}
