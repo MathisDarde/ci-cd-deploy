@@ -1,7 +1,7 @@
 # Build from the repository root: docker build -f apps/api/Dockerfile .
 
 # Stage 1: build — full toolchain, workspace dependencies, esbuild bundle.
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 RUN corepack enable
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
@@ -15,7 +15,7 @@ RUN pnpm --filter @pokewishlist/api build
 # `docker compose run migrate` uses this stage: it has tsx and the db/ SQL files.
 
 # Stage 2: runtime — only the bundle (no node_modules, no sources, no toolchain).
-FROM node:22-alpine
+FROM node:26-alpine
 WORKDIR /app
 ENV NODE_ENV=production PORT=3001
 COPY --from=build /app/apps/api/dist/server.mjs ./server.mjs
