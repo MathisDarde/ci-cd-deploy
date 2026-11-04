@@ -1,0 +1,127 @@
+{
+  "app": {
+    "name": "PokéWishlist",
+    "description": "Explora todos los Pokémon y forma el equipo de seis que quieres capturar.",
+    "nav": {
+      "label": "Navegación principal",
+      "catalog": "Catálogo",
+      "wishlist": "Mi lista"
+    },
+    "language": "Idioma",
+    "dataSource": "Datos e ilustraciones de",
+    "trademark": "Pokémon es una marca de Nintendo / Game Freak / The Pokémon Company.",
+    "dismiss": "Cerrar"
+  },
+  "home": {
+    "title": "Todos los Pokémon",
+    "intro": "Busca en la Pokédex y añade hasta {limit} Pokémon a tu lista.",
+    "seoTitle": "PokéWishlist — forma tu equipo soñado"
+  },
+  "catalog": {
+    "count": "ningún Pokémon | {count} Pokémon | {count} Pokémon",
+    "outOf": "de {total}",
+    "loading": "Cargando la Pokédex…",
+    "errorTitle": "No se pudo cargar la Pokédex",
+    "errorText": "PokéAPI no responde en este momento. Comprueba tu conexión e inténtalo de nuevo.",
+    "retry": "Reintentar",
+    "emptyTitle": "Ningún Pokémon coincide con estos filtros",
+    "emptyText": "Prueba otro nombre o quita un filtro.",
+    "reset": "Borrar filtros",
+    "more": "Mostrar más"
+  },
+  "toolbar": {
+    "label": "Búsqueda, filtros y orden",
+    "search": "Buscar",
+    "searchPlaceholder": "Nombre o número",
+    "generation": "Generación",
+    "generationOption": "Generación {gen}",
+    "all": "Todas",
+    "rarity": "Rareza",
+    "sortBy": "Ordenar por",
+    "ascending": "↑ Ascendente",
+    "descending": "↓ Descendente",
+    "types": "Tipos (2 máximo)",
+    "clearAll": "Borrar todo"
+  },
+  "sort": {
+    "id": "Número",
+    "name": "Nombre",
+    "totalStats": "Total de estadísticas",
+    "hp": "PS",
+    "attack": "Ataque",
+    "defense": "Defensa",
+    "speed": "Velocidad",
+    "height": "Altura",
+    "weight": "Peso"
+  },
+  "rarity": {
+    "legendary": "Legendario",
+    "mythical": "Singular"
+  },
+  "stats": {
+    "hp": "PS",
+    "attack": "Ataque",
+    "defense": "Defensa",
+    "specialAttack": "At. esp.",
+    "specialDefense": "Def. esp.",
+    "speed": "Velocidad",
+    "attackShort": "ATQ",
+    "defenseShort": "DEF",
+    "speedShort": "VEL"
+  },
+  "types": {
+    "normal": "Normal",
+    "fire": "Fuego",
+    "water": "Agua",
+    "electric": "Eléctrico",
+    "grass": "Planta",
+    "ice": "Hielo",
+    "fighting": "Lucha",
+    "poison": "Veneno",
+    "ground": "Tierra",
+    "flying": "Volador",
+    "psychic": "Psíquico",
+    "bug": "Bicho",
+    "rock": "Roca",
+    "ghost": "Fantasma",
+    "dragon": "Dragón",
+    "dark": "Siniestro",
+    "steel": "Acero",
+    "fairy": "Hada"
+  },
+  "wishlist": {
+    "title": "Mi lista",
+    "intro": "Los Pokémon que quieres capturar, {limit} como máximo.",
+    "count": "{count} / {limit}",
+    "empty": "Tu lista está vacía.",
+    "emptyCta": "Explorar el catálogo",
+    "emptySlot": "Hueco libre",
+    "add": "Añadir {name} a mi lista",
+    "remove": "Quitar {name} de mi lista",
+    "like": "Me gusta {name}",
+    "likes": "ningún me gusta | 1 me gusta | {count} me gusta",
+    "added": "{name} añadido a tu lista.",
+    "removed": "{name} quitado de tu lista.",
+    "loading": "Cargando tu lista…",
+    "loadError": "No se pudo cargar la lista. ¿Está la API en marcha?",
+    "networkError": "No se puede contactar con la API. Inténtalo de nuevo en un momento.",
+    "full": "Equipo completo"
+  },
+  "pokemon": {
+    "number": "N.º {number}",
+    "height": "Altura",
+    "weight": "Peso",
+    "abilities": "Habilidades",
+    "baseStats": "Estadísticas base",
+    "back": "Volver al catálogo",
+    "seoDescription": "{name}: tipos, estadísticas base, altura y peso. Añádelo a tu PokéWishlist.",
+    "loadError": "No se pudo cargar este Pokémon desde PokéAPI."
+  },
+  "error": {
+    "notFoundTitle": "Página no encontrada",
+    "notFoundText": "Este Pokémon o esta página no existe.",
+    "genericTitle": "Algo ha fallado",
+    "genericText": "Inténtalo de nuevo en un momento.",
+    "home": "Volver al catálogo"
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "app": {
+    "name": "PokéWishlist",
+    "description": "Parcourez tous les Pokémon et composez l’équipe de six que vous voulez capturer.",
+    "nav": {
+      "label": "Navigation principale",
+      "catalog": "Catalogue",
+      "wishlist": "Ma liste"
+    },
+    "language": "Langue",
+    "dataSource": "Données et illustrations via",
+    "trademark": "Pokémon est une marque de Nintendo / Game Freak / The Pokémon Company.",
+    "dismiss": "Fermer"
+  },
+  "home": {
+    "title": "Tous les Pokémon",
+    "intro": "Cherchez dans le Pokédex et ajoutez jusqu’à {limit} Pokémon à votre liste.",
+    "seoTitle": "PokéWishlist — composez votre équipe de rêve"
+  },
+  "catalog": {
+    "count": "aucun Pokémon | {count} Pokémon | {count} Pokémon",
+    "outOf": "sur {total}",
+    "loading": "Chargement du Pokédex…",
+    "errorTitle": "Le Pokédex n’a pas pu être chargé",
+    "errorText": "PokéAPI ne répond pas pour le moment. Vérifiez votre connexion puis réessayez.",
+    "retry": "Réessayer",
+    "emptyTitle": "Aucun Pokémon ne correspond à ces filtres",
+    "emptyText": "Essayez un autre nom ou retirez un filtre.",
+    "reset": "Effacer les filtres",
+    "more": "Afficher plus"
+  },
+  "toolbar": {
+    "label": "Recherche, filtres et tri",
+    "search": "Recherche",
+    "searchPlaceholder": "Nom ou numéro",
+    "generation": "Génération",
+    "generationOption": "Génération {gen}",
+    "all": "Toutes",
+    "rarity": "Rareté",
+    "sortBy": "Trier par",
+    "ascending": "↑ Croissant",
+    "descending": "↓ Décroissant",
+    "types": "Types (2 maximum)",
+    "clearAll": "Tout effacer"
+  },
+  "sort": {
+    "id": "Numéro",
+    "name": "Nom",
+    "totalStats": "Total des stats",
+    "hp": "PV",
+    "attack": "Attaque",
+    "defense": "Défense",
+    "speed": "Vitesse",
+    "height": "Taille",
+    "weight": "Poids"
+  },
+  "rarity": {
+    "legendary": "Légendaire",
+    "mythical": "Fabuleux"
+  },
+  "stats": {
+    "hp": "PV",
+    "attack": "Attaque",
+    "defense": "Défense",
+    "specialAttack": "Attaque spé.",
+    "specialDefense": "Défense spé.",
+    "speed": "Vitesse",
+    "attackShort": "ATQ",
+    "defenseShort": "DÉF",
+    "speedShort": "VIT"
+  },
+  "types": {
+    "normal": "Normal",
+    "fire": "Feu",
+    "water": "Eau",
+    "electric": "Électrik",
+    "grass": "Plante",
+    "ice": "Glace",
+    "fighting": "Combat",
+    "poison": "Poison",
+    "ground": "Sol",
+    "flying": "Vol",
+    "psychic": "Psy",
+    "bug": "Insecte",
+    "rock": "Roche",
+    "ghost": "Spectre",
+    "dragon": "Dragon",
+    "dark": "Ténèbres",
+    "steel": "Acier",
+    "fairy": "Fée"
+  },
+  "wishlist": {
+    "title": "Ma liste",
+    "intro": "Les Pokémon que vous voulez capturer, {limit} au maximum.",
+    "count": "{count} / {limit}",
+    "empty": "Votre liste est vide.",
+    "emptyCta": "Parcourir le catalogue",
+    "emptySlot": "Place libre",
+    "add": "Ajouter {name} à ma liste",
+    "remove": "Retirer {name} de ma liste",
+    "like": "Aimer {name}",
+    "likes": "aucun j’aime | 1 j’aime | {count} j’aime",
+    "added": "{name} ajouté à votre liste.",
+    "removed": "{name} retiré de votre liste.",
+    "loading": "Chargement de votre liste…",
+    "loadError": "La liste n’a pas pu être chargée. L’API est-elle démarrée ?",
+    "networkError": "L’API est injoignable. Réessayez dans un instant.",
+    "full": "Équipe complète"
+  },
+  "pokemon": {
+    "number": "N° {number}",
+    "height": "Taille",
+    "weight": "Poids",
+    "abilities": "Talents",
+    "baseStats": "Statistiques de base",
+    "back": "Retour au catalogue",
+    "seoDescription": "{name} : types, statistiques de base, taille et poids. Ajoutez-le à votre PokéWishlist.",
+    "loadError": "Ce Pokémon n’a pas pu être chargé depuis PokéAPI."
+  },
+  "error": {
+    "notFoundTitle": "Page introuvable",
+    "notFoundText": "Ce Pokémon ou cette page n’existe pas.",
+    "genericTitle": "Une erreur est survenue",
+    "genericText": "Réessayez dans un instant.",
+    "home": "Retour au catalogue"
+  }
+}
