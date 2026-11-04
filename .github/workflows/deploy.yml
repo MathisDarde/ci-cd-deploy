@@ -2,9 +2,9 @@ name: Deploy (reusable)
 
 # One environment, always in this order: infra → migrations → build → deploy → smoke tests.
 # The same commit is built and deployed; only the configuration (GitHub environment
-# secrets and variables) changes between stg and prd.
+# secrets and variables) changes between environments.
 #
-# GitHub environment settings (Settings → Environments → stg / prd):
+# GitHub environment settings (Settings → Environments → prd):
 #   variables: AWS_DEPLOY_ROLE_ARN, AWS_REGION, TF_STATE_BUCKET, VERCEL_ORG_ID, VERCEL_PROJECT_ID
 #   secrets:   DATABASE_URL (Supabase pooler, 6543), MIGRATION_DATABASE_URL (direct, 5432), VERCEL_TOKEN
 #   prd only:  "Required reviewers" = the human click before production.

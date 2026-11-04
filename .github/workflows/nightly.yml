@@ -55,21 +55,23 @@ jobs:
           retention-days: 14
 
   load:
-    name: Load test (k6, staging)
-    # Needs the repository variables STG_API_URL and STG_SSR_URL.
-    if: vars.STG_API_URL != ''
+    name: Load test (k6)
+    # Opt-in: set the repository variables LOAD_TEST_API_URL / LOAD_TEST_SSR_URL.
+    # Without a staging environment, think twice before loading production.
+    if: vars.LOAD_TEST_API_URL != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: grafana/setup-k6-action@v1
       - run: k6 run tests/load/browse.js
         env:
-          API_URL: ${{ vars.STG_API_URL }}
-          SSR_URL: ${{ vars.STG_SSR_URL }}
+          API_URL: ${{ vars.LOAD_TEST_API_URL }}
+          SSR_URL: ${{ vars.LOAD_TEST_SSR_URL }}
 
   dast:
-    name: DAST (OWASP ZAP baseline, staging)
-    if: vars.STG_SSR_URL != ''
+    name: DAST (OWASP ZAP baseline)
+    # Opt-in: set the repository variable DAST_TARGET_URL (passive scan only).
+    if: vars.DAST_TARGET_URL != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -78,7 +80,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: zaproxy/action-baseline@v0.14.0
         with:
-          target: ${{ vars.STG_SSR_URL }}
+          target: ${{ vars.DAST_TARGET_URL }}
           rules_file_name: .zap/rules.tsv
           allow_issue_writing: false
           fail_action: true

@@ -1,7 +1,8 @@
 name: CD
 
-# Continuous delivery: after a green CI on main, the same commit goes to staging
-# automatically, then to production after a human approval (environment "prd").
+# Continuous delivery: after a green CI on main, the commit goes to production once a
+# human approves it (environment "prd" has required reviewers: the "human click").
+# A staging environment can be added later: one more deploy.yml call with environment: stg.
 on:
   workflow_run:
     workflows: [CI]
@@ -30,16 +31,8 @@ jobs:
       - id: ref
         run: echo "ref=${{ inputs.ref || github.event.workflow_run.head_sha || github.sha }}" >> "$GITHUB_OUTPUT"
 
-  staging:
-    needs: resolve
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: stg
-      ref: ${{ needs.resolve.outputs.ref }}
-    secrets: inherit
-
   production:
-    needs: [resolve, staging]
+    needs: resolve
     uses: ./.github/workflows/deploy.yml
     with:
       environment: prd

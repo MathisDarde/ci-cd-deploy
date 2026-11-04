@@ -13,7 +13,7 @@ terraform {
   }
 
   # Remote state, one file per environment (partial configuration):
-  #   terraform init -backend-config=environments/backend.hcl -backend-config="key=pokewishlist/stg.tfstate"
+  #   terraform init -backend-config=environments/backend.hcl -backend-config="key=pokewishlist/prd.tfstate"
   # The bucket comes from infra/bootstrap.
   backend "s3" {}
 }
