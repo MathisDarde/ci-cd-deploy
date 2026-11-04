@@ -1,0 +1,47 @@
+name: CD
+
+# Continuous delivery: after a green CI on main, the same commit goes to staging
+# automatically, then to production after a human approval (environment "prd").
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Commit SHA or tag to deploy (default: main)'
+        required: false
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  resolve:
+    # workflow_run fires for every CI run: only deploy green pushes on main.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.ref.outputs.ref }}
+    steps:
+      - id: ref
+        run: echo "ref=${{ inputs.ref || github.event.workflow_run.head_sha || github.sha }}" >> "$GITHUB_OUTPUT"
+
+  staging:
+    needs: resolve
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: stg
+      ref: ${{ needs.resolve.outputs.ref }}
+    secrets: inherit
+
+  production:
+    needs: [resolve, staging]
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: prd
+      ref: ${{ needs.resolve.outputs.ref }}
+    secrets: inherit

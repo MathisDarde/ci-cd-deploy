@@ -1,0 +1,212 @@
+name: Deploy (reusable)
+
+# One environment, always in this order: infra → migrations → build → deploy → smoke tests.
+# The same commit is built and deployed; only the configuration (GitHub environment
+# secrets and variables) changes between stg and prd.
+#
+# GitHub environment settings (Settings → Environments → stg / prd):
+#   variables: AWS_DEPLOY_ROLE_ARN, AWS_REGION, TF_STATE_BUCKET, VERCEL_ORG_ID, VERCEL_PROJECT_ID
+#   secrets:   DATABASE_URL (Supabase pooler, 6543), MIGRATION_DATABASE_URL (direct, 5432), VERCEL_TOKEN
+#   prd only:  "Required reviewers" = the human click before production.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      ref:
+        description: Commit to deploy.
+        required: true
+        type: string
+
+permissions:
+  contents: write # deployment tags
+  id-token: write # AWS OIDC
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.ssr.outputs.url }}
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: false
+    env:
+      ENV_NAME: ${{ inputs.environment }}
+      AWS_REGION: ${{ vars.AWS_REGION || 'eu-west-3' }}
+      APP_VERSION: ${{ inputs.ref }}
+      TF_VAR_database_url: ${{ secrets.DATABASE_URL }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      # Short-lived credentials through OIDC: no AWS access key stored in GitHub.
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ---------- 1. INFRA ----------
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform init
+        working-directory: infra/terraform
+        run: |
+          terraform init -input=false \
+            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="key=pokewishlist/${ENV_NAME}.tfstate" \
+            -backend-config="region=${AWS_REGION}" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
+
+      - name: Terraform plan
+        working-directory: infra/terraform
+        run: terraform plan -input=false -var-file="environments/${ENV_NAME}.tfvars" -out=tfplan
+
+      - name: Terraform apply
+        working-directory: infra/terraform
+        run: terraform apply -input=false tfplan
+
+      - name: Read infrastructure outputs
+        id: tf
+        working-directory: infra/terraform
+        run: |
+          {
+            echo "api_url=$(terraform output -raw api_url)"
+            echo "function=$(terraform output -raw lambda_function_name)"
+            echo "alias=$(terraform output -raw lambda_alias)"
+            echo "bucket=$(terraform output -raw front_bucket)"
+            echo "distribution=$(terraform output -raw cloudfront_distribution_id)"
+            echo "front_url=$(terraform output -raw front_url)"
+          } >> "$GITHUB_OUTPUT"
+
+      # ---------- 2. MIGRATIONS ----------
+      # Expand-only migrations: the version still running keeps working during the deploy.
+      - name: Database migrations
+        run: pnpm db:migrate
+        env:
+          MIGRATION_DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+
+      # ---------- 3. BUILD ----------
+      - name: Build the API artefact
+        run: |
+          pnpm --filter @pokewishlist/api build
+          cd apps/api/dist/lambda && zip -qr ../../api.zip .
+          echo "API artefact: $(du -h ../../api.zip | cut -f1)"
+
+      # ---------- 4. DEPLOY: API (Lambda) ----------
+      - name: Deploy the API (new version, alias moved)
+        id: api
+        env:
+          FUNCTION: ${{ steps.tf.outputs.function }}
+          ALIAS: ${{ steps.tf.outputs.alias }}
+        run: |
+          previous=$(aws lambda get-alias --function-name "$FUNCTION" --name "$ALIAS" --query FunctionVersion --output text)
+          echo "previous=$previous" >> "$GITHUB_OUTPUT"
+
+          aws lambda update-function-code --function-name "$FUNCTION" \
+            --zip-file fileb://apps/api/api.zip > /dev/null
+          aws lambda wait function-updated-v2 --function-name "$FUNCTION"
+
+          version=$(aws lambda publish-version --function-name "$FUNCTION" \
+            --description "${APP_VERSION}" --query Version --output text)
+          aws lambda wait published-version-active --function-name "$FUNCTION" --qualifier "$version"
+          aws lambda update-alias --function-name "$FUNCTION" --name "$ALIAS" --function-version "$version" > /dev/null
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "### API: Lambda version $version (was $previous)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Smoke test the API
+        run: node scripts/smoke.mjs
+        env:
+          API_URL: ${{ steps.tf.outputs.api_url }}
+
+      # ---------- 4. DEPLOY: SSR front (Vercel) ----------
+      - name: Deploy the SSR front to Vercel
+        id: ssr
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          API_URL: ${{ steps.tf.outputs.api_url }}
+        run: |
+          # prd → Vercel production; any other environment → a preview deployment.
+          target=preview
+          flags=()
+          if [ "$ENV_NAME" = "prd" ]; then
+            target=production
+            flags+=(--prod)
+          fi
+          npx --yes vercel@latest pull --yes --environment="$target" --token="$VERCEL_TOKEN"
+          NUXT_PUBLIC_APP_VERSION="$APP_VERSION" \
+            npx --yes vercel@latest build "${flags[@]}" --token="$VERCEL_TOKEN"
+          url=$(npx --yes vercel@latest deploy --prebuilt "${flags[@]}" --token="$VERCEL_TOKEN" \
+            --env NUXT_PUBLIC_API_BASE="$API_URL" \
+            --env NUXT_PUBLIC_APP_VERSION="$APP_VERSION")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "### SSR front: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      # ---------- 4. DEPLOY: SSG front (S3 + CloudFront) ----------
+      - name: Generate the static site
+        run: pnpm --filter @pokewishlist/web generate
+        env:
+          NUXT_PUBLIC_API_BASE: ${{ steps.tf.outputs.api_url }}
+          NUXT_PUBLIC_SITE_URL: ${{ steps.tf.outputs.front_url }}
+          NUXT_PUBLIC_I18N_BASE_URL: ${{ steps.tf.outputs.front_url }}
+          NUXT_PUBLIC_APP_VERSION: ${{ inputs.ref }}
+          PRERENDER_POKEMON_LIMIT: ${{ vars.PRERENDER_POKEMON_LIMIT || '151' }}
+
+      - name: Upload to S3 and invalidate CloudFront
+        env:
+          BUCKET: ${{ steps.tf.outputs.bucket }}
+          DISTRIBUTION: ${{ steps.tf.outputs.distribution }}
+        run: |
+          out=apps/web/.output/public
+          # Hashed assets never change: cache them for a year.
+          aws s3 sync "$out/_nuxt" "s3://$BUCKET/_nuxt" \
+            --cache-control "public,max-age=31536000,immutable"
+          # HTML and payloads: always revalidated, so a deploy is visible at once.
+          aws s3 sync "$out" "s3://$BUCKET" --delete --exclude "_nuxt/*" \
+            --cache-control "public,max-age=0,must-revalidate"
+          aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION" --paths "/*" > /dev/null
+          echo "### SSG front: ${{ steps.tf.outputs.front_url }}" >> "$GITHUB_STEP_SUMMARY"
+
+      # ---------- 5. SMOKE TESTS ----------
+      - name: Smoke tests (API, SSR, SSG)
+        run: node scripts/smoke.mjs
+        env:
+          API_URL: ${{ steps.tf.outputs.api_url }}
+          SSR_URL: ${{ steps.ssr.outputs.url }}
+          SSG_URL: ${{ steps.tf.outputs.front_url }}
+          SMOKE_ATTEMPTS: '10'
+
+      - name: SEO check (HTML without JavaScript)
+        run: node scripts/seo-check.mjs "${{ steps.ssr.outputs.url }}" "${{ steps.tf.outputs.front_url }}"
+
+      # ---------- Bookkeeping / automatic rollback ----------
+      - name: Tag the stable deployment
+        run: |
+          tag="deploy-${ENV_NAME}-$(date -u +%Y%m%d-%H%M%S)"
+          git tag -a "$tag" -m "Deployed to ${ENV_NAME} (Lambda version ${{ steps.api.outputs.version }}, ${{ steps.ssr.outputs.url }})"
+          git push origin "$tag"
+
+      - name: Roll back the API on failure
+        if: failure() && steps.api.outputs.previous != ''
+        run: |
+          aws lambda update-alias --function-name "${{ steps.tf.outputs.function }}" \
+            --name "${{ steps.tf.outputs.alias }}" --function-version "${{ steps.api.outputs.previous }}"
+          echo "### ⚠️ Rolled the API back to Lambda version ${{ steps.api.outputs.previous }}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Roll back the SSR front on failure
+        if: failure() && steps.ssr.outputs.url != '' && inputs.environment == 'prd'
+        run: npx --yes vercel@latest rollback --yes --token="${{ secrets.VERCEL_TOKEN }}"
