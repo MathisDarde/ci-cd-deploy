@@ -1,0 +1,51 @@
+name: Coverage report
+
+# After each push on main: HTML coverage reports + README badges, published on GitHub Pages.
+# One-time setup: Settings → Pages → Source: "GitHub Actions".
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm test:coverage
+      - name: Build the site
+        run: |
+          mkdir -p site
+          node scripts/coverage-summary.mjs --badges site/badges > site/summary.md
+          cat site/summary.md >> "$GITHUB_STEP_SUMMARY"
+          for pkg in packages/shared apps/api apps/web; do
+            name=$(basename "$pkg")
+            cp -r "$pkg/coverage" "site/$name"
+          done
+          cat > site/index.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>PokéWishlist coverage</title>
+          <h1>PokéWishlist — test coverage</h1>
+          <ul>
+            <li><a href="shared/index.html">packages/shared</a></li>
+            <li><a href="api/index.html">apps/api</a></li>
+            <li><a href="web/index.html">apps/web</a></li>
+          </ul>
+          HTML
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

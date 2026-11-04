@@ -1,0 +1,200 @@
+name: CI
+
+# Every push and every PR: the code is checked on a neutral machine, red or green in minutes.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint (ESLint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm lint
+
+  format:
+    name: Format (Prettier --check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm format:check
+
+  typecheck:
+    name: Types (tsc, vue-tsc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm typecheck
+
+  i18n:
+    name: Translations (locale keys)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Home-made check: plain Node, no dependency needed.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/check-i18n.mjs
+
+  unit:
+    name: Unit tests (Vitest + coverage)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm test:coverage
+      - name: Coverage summary
+        if: always()
+        run: node scripts/coverage-summary.mjs >> "$GITHUB_STEP_SUMMARY"
+      - name: Coverage comment (shared)
+        if: always() && github.event_name == 'pull_request'
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          name: shared
+          working-directory: packages/shared
+      - name: Coverage comment (api)
+        if: always() && github.event_name == 'pull_request'
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          name: api
+          working-directory: apps/api
+      - name: Coverage comment (web)
+        if: always() && github.event_name == 'pull_request'
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          name: web
+          working-directory: apps/web
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: |
+            packages/shared/coverage
+            apps/api/coverage
+            apps/web/coverage
+          retention-days: 14
+
+  integration:
+    name: Integration tests (Hono + PostgreSQL)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: pokewishlist_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U test" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://test:test@localhost:5432/pokewishlist_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter @pokewishlist/api test:integration
+
+  build:
+    name: Build (API bundle, nuxt build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm build
+        env:
+          APP_VERSION: ${{ github.sha }}
+          NUXT_PUBLIC_APP_VERSION: ${{ github.sha }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build
+          include-hidden-files: true
+          path: |
+            apps/api/dist
+            apps/web/.output
+          retention-days: 7
+
+  audit:
+    name: Audit (known vulnerabilities)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      # Production dependencies only; high and critical advisories block the PR.
+      - run: pnpm audit --prod --audit-level=high
+
+  secrets:
+    name: Secrets (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  e2e:
+    name: E2E (Playwright, Nuxt + Hono + PostgreSQL)
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: pokewishlist_e2e
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U test" --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgres://test:test@localhost:5432/pokewishlist_e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: apps
+      - name: Database schema (init.sql + migrations)
+        run: pnpm db:migrate
+      - name: Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      # playwright.config.ts starts the built API and the built Nuxt server.
+      - run: pnpm test:e2e --project=chromium --project=mobile
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 14
+
+  # One required check for branch protection: every job above must be green.
+  ci-ok:
+    name: CI passed
+    if: always()
+    needs: [lint, format, typecheck, i18n, unit, integration, build, audit, secrets, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - run: echo "All checks are green."

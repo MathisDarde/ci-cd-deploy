@@ -1,0 +1,17 @@
+name: Setup
+description: Node 22 + pnpm, dependencies installed exactly from the lockfile (cached between runs).
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: pnpm
+
+    # --frozen-lockfile = `npm ci`: fails if package.json and the lockfile disagree.
+    - name: Install
+      shell: bash
+      run: pnpm install --frozen-lockfile
