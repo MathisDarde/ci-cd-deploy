@@ -16,8 +16,8 @@
   "dependencies": {
     "@hono/node-server": "^2.1.6",
     "@pokewishlist/shared": "workspace:*",
-    "hono": "^4.13.16",
-    "postgres": "^4.0.0"
+    "hono": "^4.13.17",
+    "postgres": "^4.1.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.164",
