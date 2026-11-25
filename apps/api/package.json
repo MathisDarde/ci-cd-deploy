@@ -14,17 +14,17 @@
     "db:migrate": "tsx src/migrate-cli.ts"
   },
   "dependencies": {
-    "@hono/node-server": "^2.1.6",
+    "@hono/node-server": "^2.1.11",
     "@pokewishlist/shared": "workspace:*",
-    "hono": "^4.13.16",
-    "postgres": "^4.0.0"
+    "hono": "^4.13.20",
+    "postgres": "^4.1.1"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.164",
     "@types/node": "^26.6.6",
-    "@vitest/coverage-v8": "^5.1.0",
+    "@vitest/coverage-v8": "^5.1.1",
     "esbuild": "^0.28.2",
     "tsx": "^4.23.15",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   }
 }
